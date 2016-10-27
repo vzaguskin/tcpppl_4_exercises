@@ -56,7 +56,7 @@ template <class A, class B>
 void print_graph_helper()
 {
   if (A_has_B<A, B>())
-    std::cerr << typeid(A).name() << " -> " << typeid(B).name() << std::endl;
+    std::cerr << typeid(B).name() << " -> " << typeid(A).name() << std::endl;
 }
 
 template <class A, class B>
