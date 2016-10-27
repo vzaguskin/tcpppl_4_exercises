@@ -7,8 +7,15 @@ the types on your favorite implementation.*/
 //Checking if one type includes another will be done via template
 //metaprogramming mostly in compile time.
 
+//compilation - C++14 is required for relaxed constexpr functions, but this can be rewritten in c++-11
+//tested with g++-5 -std=c++14 compilation command line
+//To demangle run './a.out 2>&1 | c++filt -t > graph.txt'
+//To build graph run dot graph.txt -Tpng -o graph.png
+//See example graph.png in the source tree
+
 #include <limits>
 #include <iostream>
+#include <typeinfo>
 
 template <class A, class B>
 constexpr bool range_included()
@@ -40,5 +47,46 @@ constexpr bool exactness_match()
 template <class A, class B>
 constexpr bool A_has_B()
 {
-  return range_included<A, B>() and special_values_match<A, B>() and exactness_match<A, B>();
+  return (typeid(A) != typeid(B)) and range_included<A, B>() and special_values_match<A, B>() and exactness_match<A, B>();
+}
+
+#define TYPES bool, char, wchar_t, char16_t, char32_t, int, short, long, float, double
+
+template <class A, class B>
+void print_graph_helper()
+{
+  if (A_has_B<A, B>())
+    std::cerr << typeid(A).name() << " -> " << typeid(B).name() << std::endl;
+}
+
+template <class A, class B>
+void print_graph()
+{
+  print_graph_helper<A, B>();
+  print_graph_helper<B, A>();
+}
+
+template <class A, class B, class C, class ...D> void print_graph()
+{
+    print_graph<A, B>();
+    print_graph<A, C, D...>();
+}
+
+template <class A, class B> void print_graph_complete()
+{
+    print_graph<A, B>();
+}
+
+template <class A, class B, class C, class ...D> void print_graph_complete()
+{
+    print_graph<A, B, C, D...>();
+    print_graph_complete<B, C, D...>();
+}
+
+
+int main()
+{
+  std::cerr << "digraph G {" << std::endl;
+  print_graph_complete<TYPES>();
+  std::cerr << "}" << std::endl;
 }
