@@ -25,7 +25,7 @@ int main()
   auto p2 = &(*it2);
 
 
-
+  std::cout << *it1 << " " << *it2 << std::endl;
   std::cout << std::abs(p1-p2) << std::endl;
 
 }
